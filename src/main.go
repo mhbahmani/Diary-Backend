@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-	// "os"
 
 	"net/http"
 	"log"
@@ -28,6 +27,7 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests(){
 	http.HandleFunc("/", homePageHandler)
+	http.HandleFunc("/users", allUsers)
 
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
