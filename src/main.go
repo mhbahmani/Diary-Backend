@@ -10,13 +10,17 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-func initialMigration() {
-    db, err := gorm.Open("sqlite3", "../sqlite.db")
+func connectToDB() *gorm.DB {
+	db, err := gorm.Open("sqlite3", "../sqlite.db")
     if err != nil {
-        fmt.Println(err.Error())
-        panic("Failed to connect database")
+        panic("failed to connect database")
     }
-    defer db.Close()
+	return db
+}
+
+func initialMigration() {
+	db := connectToDB()
+	defer db.Close()
 
     db.AutoMigrate(&User{})
 }
@@ -27,7 +31,8 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests(){
 	http.HandleFunc("/", homePageHandler)
-	http.HandleFunc("/users", allUsers)
+	http.HandleFunc("/users", getAllUsers) // users
+	http.HandleFunc("/register.php", createNewUser) // users
 
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
