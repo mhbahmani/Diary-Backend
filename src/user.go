@@ -1,14 +1,14 @@
 package main
 
 import (
+	"fmt"
+
 	"net/http"
 	"encoding/json"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
-
-var db *gorm.DB
 
 type User struct {
     gorm.Model
@@ -19,15 +19,22 @@ type User struct {
 	LastName string
 }
 
-func allUsers(w http.ResponseWriter, r *http.Request) {
-    db, err := gorm.Open("sqlite3", "test.db")
-    if err != nil {
-        panic("failed to connect database")
-    }
-    defer db.Close()
-
+func getAllUsers(w http.ResponseWriter, r *http.Request) {
+	db := connectToDB()
+	defer db.Close()
     var users []User
     db.Find(&users)
 
     json.NewEncoder(w).Encode(users)
+}
+
+func createNewUser(w http.ResponseWriter, r *http.Request) {
+	db := connectToDB()
+	defer db.Close()
+
+	var user User
+	json.NewDecoder(r.Body).Decode(&user)
+
+	db.Create(&user)
+	fmt.Fprintf(w, "ok") // User successfully created
 }
