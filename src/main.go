@@ -2,9 +2,25 @@ package main
 
 import (
     "fmt"
-    "log"
-    "net/http"
+	// "os"
+
+	"net/http"
+	"log"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
+
+func initialMigration() {
+    db, err := gorm.Open("sqlite3", "../sqlite.db")
+    if err != nil {
+        fmt.Println(err.Error())
+        panic("Failed to connect database")
+    }
+    defer db.Close()
+
+    db.AutoMigrate(&User{})
+}
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "<h1>Welcome! This is home page.</h1>")
@@ -17,5 +33,7 @@ func handleRequests(){
 }
 
 func main() {	
+	initialMigration()
+
 	handleRequests()
 }
